@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import webbrowser
 from pathlib import Path
 
 from .analyze import build_report
@@ -141,6 +142,12 @@ def main(argv: list[str] | None = None) -> int:
         help="HTML 输出路径，默认 out/yearbook.html",
     )
     parser.add_argument(
+        "--open",
+        dest="open_browser",
+        action="store_true",
+        help="生成后用默认浏览器打开报告",
+    )
+    parser.add_argument(
         "--json-out",
         default="out/report.json",
         help="JSON 输出路径，默认 out/report.json",
@@ -163,6 +170,10 @@ def main(argv: list[str] | None = None) -> int:
     json_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(render_html(report), encoding="utf-8")
     json_path.write_text(render_json(report), encoding="utf-8")
+
+    if args.open_browser:
+        # 用标准库 webbrowser，天然跨平台（macOS / Linux / Windows）。
+        webbrowser.open(html_path.resolve().as_uri())
 
     if args.quiet:
         print(html_path)
