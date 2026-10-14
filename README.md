@@ -13,14 +13,24 @@
 
 ---
 
-## 30 秒体验（不需要 Token）
+## 立刻体验
+
+### 方式一：直接看在线报告（0 步）
+
+**👉 https://anghunk.github.io/mcd-yearbook/**
+
+点开就是完整报告，点任意指标右下角的「查出处」展开证据。由 GitHub Actions 自动部署，
+不需要安装任何东西，也不需要 Token。
+
+### 方式二：本地跑（30 秒，不需要 Token）
 
 ```bash
 git clone https://github.com/anghunk/mcd-yearbook.git
 cd mcd-yearbook
-python3 yearbook.py
-open out/yearbook.html
+python3 yearbook.py --open
 ```
+
+`--open` 会自动用默认浏览器打开报告。不加该参数则只生成文件，路径为 `out/yearbook.html`。
 
 **零第三方依赖**（只用 Python 标准库）、**不需要 MCP Token**、**不联网**。
 仓库内置的演示数据集跑通全链路，clone 下来就能看到真实交互效果。
@@ -76,31 +86,33 @@ open out/yearbook.html
 
 ## 真实数据模式
 
-拿到 MCP Token 后，用自己的账户跑：
+拿到 MCP Token 后（申请地址：https://open.mcd.cn/mcp ，手机号登录 → 控制台 → 激活），
+把 Token 填进环境变量，一条命令出报告：
 
 ```bash
-export MCD_MCP_TOKEN=你的token
-python3 yearbook.py --live
+MCD_MCP_TOKEN=你的token python3 yearbook.py --live --open
 ```
 
-或者先把真实响应录制到本地（推荐，之后可离线反复查看，不消耗接口调用）：
+想反复查看、又不想每次都调接口，就先录制到本地，之后离线运行：
 
 ```bash
-python3 scripts/record_fixtures.py
-python3 yearbook.py --from-real
+MCD_MCP_TOKEN=你的token python3 scripts/record_fixtures.py && python3 yearbook.py --from-real --open
 ```
-
-Token 申请：https://open.mcd.cn/mcp （手机号登录 → 控制台 → 激活）
 
 > `fixtures/real/` 含你的个人订单信息，已在 `.gitignore` 中，**不会被提交**。
 
-### 三种数据模式
+---
 
-| 命令 | 数据来源 | 说明 |
-|---|---|---|
-| `python3 yearbook.py` | `fixtures/` | 仓库内置演示数据，任何人 clone 后结果一致 |
-| `python3 yearbook.py --from-real` | `fixtures/real/` | 本机录制的真实响应，离线可重复查看 |
-| `python3 yearbook.py --live` | MCP Server | 实时取数，每次消耗 4 次接口调用 |
+## 使用方式一览
+
+| 我想要 | 怎么做 | 需要 Token |
+|---|---|:---:|
+| 先看看长什么样 | 打开 https://anghunk.github.io/mcd-yearbook/ | 否 |
+| 本地跑一遍 | `python3 yearbook.py --open` | 否 |
+| 用我的真实订单 | `MCD_MCP_TOKEN=你的token python3 yearbook.py --live --open` | 是 |
+| 离线反复看真实数据 | `... record_fixtures.py && python3 yearbook.py --from-real --open` | 仅首次录制 |
+| 只要数据文件 | 加 `--json-out 路径` 导出 `report.json` | 否 |
+| 不要打开浏览器 | 去掉 `--open` | 否 |
 
 ---
 
