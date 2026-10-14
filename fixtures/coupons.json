@@ -1,0 +1,16 @@
+{
+  "_fixture": "synthetic",
+  "_source_tool": "query-my-coupons",
+  "_warning": "结构仿真的合成演示数据，非真实券包。请在拿到 MCP Token 后用 scripts/record_fixtures.py 重新录制。",
+  "success": true,
+  "code": 200,
+  "message": "请求成功",
+  "data": {
+    "list": [
+      { "couponId": "DEMO-C-1", "couponName": "随心配 1+1 立减 3 元", "expireDate": "2026-12-31", "status": "可用" },
+      { "couponId": "DEMO-C-2", "couponName": "早餐满 15 减 4", "expireDate": "2026-11-30", "status": "可用" },
+      { "couponId": "DEMO-C-3", "couponName": "巨无霸套餐 8 折", "expireDate": "2026-10-31", "status": "可用" },
+      { "couponId": "DEMO-C-4", "couponName": "中薯条免费券", "expireDate": "2026-09-30", "status": "已过期" }
+    ]
+  }
+}

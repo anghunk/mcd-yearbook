@@ -1,0 +1,294 @@
+{
+  "_fixture": "synthetic",
+  "_source_tool": "order-list",
+  "_warning": "本文件为结构仿真的合成演示数据，字段名对齐麦当劳官方 MCP order-list 的真实响应，但订单内容为虚构。请在拿到 MCP Token 后，用 scripts/record_fixtures.py 重新录制真实响应覆盖本文件。",
+  "_license": "演示数据，不含任何真实用户信息。",
+  "success": true,
+  "code": 200,
+  "message": "请求成功",
+  "data": {
+    "list": [
+      {
+        "orderId": "DEMO-2026-0001",
+        "orderType": "1",
+        "createTime": "2026-01-08 08:12:41",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900003491",
+            "productName": "猪柳蛋麦满分组合",
+            "quantity": 1,
+            "comboItemList": [
+              { "productCode": "1088", "name": "优品豆浆小杯", "quantity": 1 },
+              { "productCode": "5022", "name": "猪柳蛋麦满分", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "15.5"
+      },
+      {
+        "orderId": "DEMO-2026-0002",
+        "orderType": "1",
+        "createTime": "2026-02-14 19:47:02",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900008751",
+            "productName": "巨无霸套餐",
+            "quantity": 1,
+            "comboItemList": [
+              { "productCode": "1440", "name": "巨无霸", "quantity": 1 },
+              { "productCode": "4810", "name": "中薯条", "quantity": 1 },
+              { "productCode": "3050", "name": "可乐中杯", "quantity": 1 }
+            ]
+          },
+          {
+            "productCode": "1600",
+            "productName": "麦香鱼",
+            "quantity": 1,
+            "comboItemList": []
+          }
+        ],
+        "realTotalAmount": "42.5"
+      },
+      {
+        "orderId": "DEMO-2026-0003",
+        "orderType": "1",
+        "createTime": "2026-03-03 12:31:18",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900002",
+        "storeName": "麦当劳示例中心餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900013476",
+            "productName": "随心配1+1",
+            "quantity": 2,
+            "comboItemList": [
+              { "productCode": "1600", "name": "麦香鱼", "quantity": 1 },
+              { "productCode": "3050", "name": "可乐中杯", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "26.0"
+      },
+      {
+        "orderId": "DEMO-2026-0004",
+        "orderType": "1",
+        "createTime": "2026-04-21 23:58:44",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "1440",
+            "productName": "巨无霸",
+            "quantity": 1,
+            "comboItemList": []
+          },
+          {
+            "productCode": "4810",
+            "productName": "中薯条",
+            "quantity": 1,
+            "comboItemList": []
+          }
+        ],
+        "realTotalAmount": "31.0"
+      },
+      {
+        "orderId": "DEMO-2026-0005",
+        "orderType": "1",
+        "createTime": "2026-05-09 12:05:10",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900003",
+        "storeName": "麦当劳示例东街得来速餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900008751",
+            "productName": "巨无霸套餐",
+            "quantity": 1,
+            "comboItemList": [
+              { "productCode": "1440", "name": "巨无霸", "quantity": 1 },
+              { "productCode": "4810", "name": "中薯条", "quantity": 1 },
+              { "productCode": "3050", "name": "可乐中杯", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "39.5"
+      },
+      {
+        "orderId": "DEMO-2026-0006",
+        "orderType": "1",
+        "createTime": "2026-06-18 08:41:33",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900003491",
+            "productName": "猪柳蛋麦满分组合",
+            "quantity": 1,
+            "comboItemList": [
+              { "productCode": "1088", "name": "优品豆浆小杯", "quantity": 1 },
+              { "productCode": "5022", "name": "猪柳蛋麦满分", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "16.0"
+      },
+      {
+        "orderId": "DEMO-2026-0007",
+        "orderType": "1",
+        "createTime": "2026-07-07 18:22:07",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900002",
+        "storeName": "麦当劳示例中心餐厅",
+        "orderStatus": "整单退款",
+        "orderProductList": [
+          {
+            "productCode": "4810",
+            "productName": "中薯条",
+            "quantity": 1,
+            "comboItemList": []
+          },
+          {
+            "productCode": "3050",
+            "productName": "可乐中杯",
+            "quantity": 1,
+            "comboItemList": []
+          }
+        ],
+        "realTotalAmount": "18.0"
+      },
+      {
+        "orderId": "DEMO-2026-0008",
+        "orderType": "1",
+        "createTime": "2026-07-29 12:44:51",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "部分退款",
+        "orderProductList": [
+          {
+            "productCode": "9900013476",
+            "productName": "随心配1+1",
+            "quantity": 1,
+            "comboItemList": [
+              { "productCode": "1600", "name": "麦香鱼", "quantity": 1 },
+              { "productCode": "3050", "name": "可乐中杯", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "13.0"
+      },
+      {
+        "orderId": "DEMO-2026-0009",
+        "orderType": "1",
+        "createTime": "2026-08-15 21:37:29",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900003",
+        "storeName": "麦当劳示例东街得来速餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "1440",
+            "productName": "巨无霸",
+            "quantity": 2,
+            "comboItemList": []
+          }
+        ],
+        "realTotalAmount": "54.0"
+      },
+      {
+        "orderId": "DEMO-2026-0010",
+        "orderType": "1",
+        "createTime": "2026-09-02 08:09:15",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900003491",
+            "productName": "猪柳蛋麦满分组合",
+            "quantity": 1,
+            "comboItemList": [
+              { "productCode": "1088", "name": "优品豆浆小杯", "quantity": 1 },
+              { "productCode": "5022", "name": "猪柳蛋麦满分", "quantity": 1 }
+            ]
+          },
+          {
+            "productCode": "4810",
+            "productName": "中薯条",
+            "quantity": 1,
+            "comboItemList": []
+          }
+        ],
+        "realTotalAmount": "29.5"
+      },
+      {
+        "orderId": "DEMO-2026-0011",
+        "orderType": "1",
+        "createTime": "2026-09-24 18:55:02",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900002",
+        "storeName": "麦当劳示例中心餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900013476",
+            "productName": "随心配1+1",
+            "quantity": 3,
+            "comboItemList": [
+              { "productCode": "1600", "name": "麦香鱼", "quantity": 1 },
+              { "productCode": "3050", "name": "可乐中杯", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "39.0"
+      },
+      {
+        "orderId": "DEMO-2026-0012",
+        "orderType": "1",
+        "createTime": "2026-10-06 07:58:20",
+        "beType": "1",
+        "beCode": "",
+        "storeCode": "1900001",
+        "storeName": "麦当劳示例路餐厅",
+        "orderStatus": "订单已完成",
+        "orderProductList": [
+          {
+            "productCode": "9900003491",
+            "productName": "猪柳蛋麦满分组合",
+            "quantity": 2,
+            "comboItemList": [
+              { "productCode": "1088", "name": "优品豆浆小杯", "quantity": 1 },
+              { "productCode": "5022", "name": "猪柳蛋麦满分", "quantity": 1 }
+            ]
+          }
+        ],
+        "realTotalAmount": "31.0"
+      }
+    ]
+  }
+}

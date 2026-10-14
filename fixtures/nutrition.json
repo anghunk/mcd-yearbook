@@ -1,0 +1,18 @@
+{
+  "_fixture": "synthetic",
+  "_source_tool": "list-nutrition-foods",
+  "_warning": "本文件为结构仿真的合成演示数据，字段名对齐官方 MCP 返回，但数值为占位示例，不可用于真实营养结论。请在拿到 MCP Token 后用 scripts/record_fixtures.py 重新录制。",
+  "success": true,
+  "code": 200,
+  "message": "请求成功",
+  "data": {
+    "list": [
+      { "productCode": "1440", "productName": "巨无霸", "energy": 550, "protein": 26, "fat": 29, "carbohydrate": 45, "sodium": 1000, "calcium": 200 },
+      { "productCode": "1600", "productName": "麦香鱼", "energy": 340, "protein": 15, "fat": 16, "carbohydrate": 34, "sodium": 640, "calcium": 130 },
+      { "productCode": "5022", "productName": "猪柳蛋麦满分", "energy": 430, "protein": 20, "fat": 24, "carbohydrate": 30, "sodium": 830, "calcium": 160 },
+      { "productCode": "4810", "productName": "中薯条", "energy": 340, "protein": 4, "fat": 16, "carbohydrate": 44, "sodium": 250, "calcium": 20 },
+      { "productCode": "3050", "productName": "可乐中杯", "energy": 150, "protein": 0, "fat": 0, "carbohydrate": 38, "sodium": 15, "calcium": 0 },
+      { "productCode": "1088", "productName": "优品豆浆小杯", "energy": 90, "protein": 5, "fat": 3, "carbohydrate": 11, "sodium": 35, "calcium": 40 }
+    ]
+  }
+}

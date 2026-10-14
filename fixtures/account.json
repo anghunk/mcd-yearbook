@@ -1,0 +1,15 @@
+{
+  "_fixture": "synthetic",
+  "_source_tool": "query-my-account",
+  "_warning": "结构仿真的合成演示数据，非真实账户。请在拿到 MCP Token 后用 scripts/record_fixtures.py 重新录制。",
+  "success": true,
+  "code": 200,
+  "message": "请求成功",
+  "data": {
+    "availablePoints": 1860,
+    "totalPoints": 4320,
+    "frozenPoints": 0,
+    "expiringPoints": 320,
+    "expiringDate": "2026-12-31"
+  }
+}
