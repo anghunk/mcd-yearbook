@@ -94,13 +94,13 @@ class Order:
 class Nutrition:
     """餐品营养数据。"""
 
-    product_code: str
     product_name: str
     energy: float
     protein: float
     fat: float
     carbohydrate: float
     sodium: float
+    energy_kj: float = 0.0
 
 
 @dataclass(frozen=True)

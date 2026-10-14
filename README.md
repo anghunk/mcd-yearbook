@@ -18,7 +18,7 @@
 ```bash
 git clone https://github.com/anghunk/mcd-yearbook.git
 cd mcd-yearbook
-python3 -m yearbook.cli --out out/yearbook.html
+python3 yearbook.py
 open out/yearbook.html
 ```
 
@@ -37,7 +37,8 @@ open out/yearbook.html
   你的麦麦生物钟：早餐 · 4 单
   深夜的那几单：1 单
   最常去：麦当劳示例路餐厅 · 7 次
-  积分账户：可用 1,860 分，其中 320 分将于 2026-12-31 过期
+  折算成热量：9,862 kcal，大约相当于慢跑 164 公里
+  积分账户：可用 1,860 分，累计获得 4,320 分
 ```
 
 ---
@@ -79,18 +80,27 @@ open out/yearbook.html
 
 ```bash
 export MCD_MCP_TOKEN=你的token
-python3 -m yearbook.cli --live
+python3 yearbook.py --live
 ```
 
-或者先把真实响应录制到本地（推荐，之后可离线反复查看）：
+或者先把真实响应录制到本地（推荐，之后可离线反复查看，不消耗接口调用）：
 
 ```bash
 python3 scripts/record_fixtures.py
+python3 yearbook.py --from-real
 ```
 
 Token 申请：https://open.mcd.cn/mcp （手机号登录 → 控制台 → 激活）
 
 > `fixtures/real/` 含你的个人订单信息，已在 `.gitignore` 中，**不会被提交**。
+
+### 三种数据模式
+
+| 命令 | 数据来源 | 说明 |
+|---|---|---|
+| `python3 yearbook.py` | `fixtures/` | 仓库内置演示数据，任何人 clone 后结果一致 |
+| `python3 yearbook.py --from-real` | `fixtures/real/` | 本机录制的真实响应，离线可重复查看 |
+| `python3 yearbook.py --live` | MCP Server | 实时取数，每次消耗 4 次接口调用 |
 
 ---
 
@@ -168,6 +178,10 @@ A：`order-list` 接口返回的是近期订单，不是完整自然年。报告
 
 **Q：报告会上传我的订单数据吗？**
 A：不会。所有统计在本机完成，HTML 是纯静态文件，不发起任何网络请求。
+
+**Q：我的账号没有订单，会怎样？**
+A：会渲染一份空状态报告，说明可能的原因（尚未下过单，或下单手机号与申请
+MCP Token 的账号不一致），而不是显示一串没有意义的零。
 
 **Q：套餐里的商品怎么统计？**
 A：套餐会展开成子项计数。点了一份巨无霸套餐，统计的是里面的巨无霸、薯条、

@@ -15,6 +15,7 @@ from collections import Counter, defaultdict
 from typing import Mapping
 
 from .models import Evidence, Metric, Nutrition, Order, Report, expand_leaf_products
+from .normalize import _normalize_product_name
 
 # 时段划分依据订单下单时间，与麦当劳常规用餐时段对齐。
 DAY_PARTS: tuple[tuple[str, int, int], ...] = (
@@ -69,6 +70,10 @@ def build_report(
     partially_refunded = [o for o in valid_orders if o.is_partially_refunded]
 
     metrics: dict[str, Metric] = {}
+
+    # ---- 空状态：账户暂无订单时，给出明确的引导而不是一串零 ----
+    if not valid_orders:
+        return _empty_report(nutrition, points, coupons, fixture_mode, len(orders), len(refunded))
 
     # ---- 数据覆盖度：先声明样本边界，后续口径的诚实前提 ----
     span_start = valid_orders[0].date if valid_orders else "-"
@@ -337,9 +342,10 @@ def build_report(
     unmatched_codes: Counter[str] = Counter()
     matched_items = 0
     for code, name, qty, order_id in leaf_stream:
-        record = nutrition.get(code)
+        # 营养表以商品名称为键（该 Tool 不返回商品编码），因此按名称匹配。
+        record = nutrition.get(_normalize_product_name(name)) or nutrition.get(code)
         if record is None:
-            unmatched_codes[code] += qty
+            unmatched_codes[name or code] += qty
             continue
         matched_items += qty
         total_energy += record.energy * qty
@@ -349,7 +355,7 @@ def build_report(
             Evidence(
                 tool="list-nutrition-foods",
                 locator=order_id,
-                field=f"{code}.energy",
+                field=f"{record.product_name}.energyKcal",
                 value=f"{name} × {qty} × {record.energy:g} kcal",
                 note="营养值乘以份数",
             )
@@ -364,8 +370,10 @@ def build_report(
             derivation="每个商品单元的 energy 乘以其份数后求和。",
             evidence=nutrition_evidence,
             caveat=(
-                f"有 {sum(unmatched_codes.values())} 份商品未匹配到营养数据，"
-                "未计入热量合计（不按 0 估）。"
+                f"有 {sum(unmatched_codes.values())} 份商品未匹配到营养数据"
+                f"（{'、'.join(sorted(unmatched_codes)[:5])}"
+                f"{' 等' if len(unmatched_codes) > 5 else ''}），"
+                "未计入热量合计（不按 0 估）。套餐内的组合项若名称与营养表不一致，也会落入此类。"
                 if unmatched_codes
                 else None
             ),
@@ -414,14 +422,8 @@ def build_report(
         key="points",
         label="积分账户",
         value=dict(points),
-        display=(
-            f"可用 {points.get('available', 0):,} 分"
-            + (
-                f"，其中 {points.get('expiring', 0):,} 分将于 {points.get('expiring_date', '')} 过期"
-                if points.get("expiring")
-                else ""
-            )
-        ),
+        display=(f"可用 {points.get('available', 0):,} 分，累计获得 {points.get('total', 0):,} 分"
+                 + (f"，已使用 {points.get('used', 0):,} 分" if points.get("used") else "")),
         derivation="直接取自 query-my-account 的 availablePoints / expiringPoints。",
         evidence=[
             Evidence(
@@ -435,8 +437,8 @@ def build_report(
                 tool="query-my-account",
                 locator="account",
                 field="expiringPoints",
-                value=f"{points.get('expiring', 0)}（{points.get('expiring_date', '')}）",
-                note="即将过期积分",
+                value=f"{points.get('expiring', 0)}",
+                note="本月即将过期积分",
             ),
         ],
     )
@@ -474,6 +476,117 @@ def build_report(
         metrics=metrics,
         story=story,
         source_summary=source_summary,
+        fixture_mode=fixture_mode,
+    )
+
+
+def _empty_report(
+    nutrition: Mapping[str, Nutrition],
+    points: Mapping[str, object],
+    coupons: list[dict[str, str]],
+    fixture_mode: bool,
+    raw_order_count: int,
+    refunded_count: int,
+) -> Report:
+    """账户暂无有效订单时的报告。
+
+    麦当劳 `order-list` 只返回本账号的历史订单。新账号或从未下过单的账号
+    会得到空列表——这是合法状态。此处不渲染一串无意义的零，而是明确说明
+    "没有可统计的订单"，并保留已能取到的账户与营养数据。
+    """
+    metrics: dict[str, Metric] = {}
+
+    metrics["coverage"] = Metric(
+        key="coverage",
+        label="数据覆盖范围",
+        value=0,
+        display="暂无可统计的订单",
+        derivation=(
+            "统计口径为 order-list 返回的历史订单，剔除「整单退款」。"
+            "当前账号没有可用订单。"
+        ),
+        evidence=[],
+        caveat=(
+            f"接口返回 {raw_order_count} 条记录，其中 {refunded_count} 条为整单退款，"
+            "因此没有可计入统计的订单。"
+            if raw_order_count
+            else (
+                "order-list 未返回任何订单。可能原因：该账号尚未下过单；"
+                "或下单时使用的手机号与申请 MCP Token 的账号不是同一个。"
+            )
+        ),
+    )
+
+    metrics["points"] = Metric(
+        key="points",
+        label="积分账户",
+        value=dict(points),
+        display=f"可用 {points.get('available', 0):,} 分，累计获得 {points.get('total', 0):,} 分",
+        derivation="直接取自 query-my-account 的 availablePoint / accumulativePoint。",
+        evidence=[
+            Evidence(
+                tool="query-my-account",
+                locator="account",
+                field="availablePoint",
+                value=str(points.get("available", 0)),
+                note="可用积分",
+            )
+        ],
+    )
+
+    metrics["coupons"] = Metric(
+        key="coupons",
+        label="券包状态",
+        value={"active": len([c for c in coupons if "过期" not in c.get("status", "")]),
+               "expired": len([c for c in coupons if "过期" in c.get("status", "")])},
+        display=f"可用 {len(coupons)} 张券" if coupons else "暂无可用券",
+        derivation="来自 query-my-coupons；无券时该 Tool 返回文案而非 JSON。",
+        evidence=[
+            Evidence(
+                tool="query-my-coupons",
+                locator=c.get("coupon_id", ""),
+                field="status",
+                value=f"{c.get('name', '')} → {c.get('status', '')}",
+                note=f"有效期至 {c.get('expire_date', '')}",
+            )
+            for c in coupons
+        ],
+        caveat=None if coupons else "当前账号没有可用优惠券。",
+    )
+
+    metrics["nutrition_table"] = Metric(
+        key="nutrition_table",
+        label="营养数据库",
+        value=len(nutrition),
+        display=f"已加载 {len(nutrition)} 条餐品营养数据",
+        derivation="来自 list-nutrition-foods，用于在有订单时把商品换算成热量与营养素。",
+        evidence=[
+            Evidence(
+                tool="list-nutrition-foods",
+                locator=name,
+                field="energyKcal",
+                value=f"{rec.energy:g} kcal",
+                note="样例数据，完整表见 fixtures",
+            )
+            for name, rec in list(nutrition.items())[:10]
+        ],
+    )
+
+    story = [
+        ("当前状态", "这个账号还没有可统计的麦当劳订单", "coverage"),
+        ("营养数据库", f"已加载 {len(nutrition)} 条餐品营养数据，随时可用", "nutrition_table"),
+        ("积分账户", metrics["points"].display, "points"),
+    ]
+
+    return Report(
+        metrics=metrics,
+        story=story,
+        source_summary={
+            "order-list": "0 条订单",
+            "list-nutrition-foods": f"{len(nutrition)} 条营养记录",
+            "query-my-account": "积分账户 1 条",
+            "query-my-coupons": f"{len(coupons)} 张券",
+        },
         fixture_mode=fixture_mode,
     )
 

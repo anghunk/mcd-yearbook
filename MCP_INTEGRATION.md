@@ -37,11 +37,23 @@ Token 通过环境变量 `MCD_MCP_TOKEN` 注入，仓库内不含任何真实凭
 ### 2.2 辅助说明
 
 - `order-list` 同时覆盖到店与麦乐送订单，返回字段含 `orderType`。
-- `list-nutrition-foods` 返回以 `productCode` 为键的营养表，本项目用
-  `orderProductList[].comboItemList[].productCode` 与之关联。**未匹配到营养数据的商品会被显式计数，
+- `list-nutrition-foods` **只返回商品名称，不返回商品编码**（见下节实测记录），
+  因此本项目以规范化后的商品名与订单明细关联。**未匹配到营养数据的商品会被显式计数，
   不会按 0 计入**，避免用户看到一个虚低的合计值。
 - 本项目未使用 `available-coupons` 与 `mall-*` 系列，原因是年度回顾场景关注的是
   "已经发生的事"，而非"现在可以领什么"。这是一条刻意的边界。
+
+### 2.3 实测响应格式（与公开文档存在的差异）
+
+以下结论来自 2026-10-14 对官方 Server 的真实调用，实现以实测为准：
+
+| 观察 | 说明 | 本项目的处理 |
+|---|---|---|
+| Tool 结果被 Markdown 包裹 | `content[0].text` 是"字段说明 + `## Original Response` + JSON"的文档，不是裸 JSON | `extract_payload()` 定位 `## Original Response` 段后再解析 |
+| `data` 类型因 Tool 而异 | `order-list` 是对象含 `list`；`list-nutrition-foods` 是**文本表格**；`query-my-coupons` 无券时是纯 Markdown 文案 | 每个 Tool 单独解析，类型不符时抛 `SchemaError` |
+| 营养表无商品编码 | 表头为 `[160]{productName,nutritionDescription,energyKj,energyKcal,protein,fat,carbohydrate,sodium,calcium}:`，只有名称 | 按表头动态定位列，以名称建立索引 |
+| 积分字段为单数 | 实际是 `availablePoint` / `accumulativePoint` / `currentMouthExpirePoint`（原样保留官方的拼写） | `parse_points()` 同时兼容单复数两种命名 |
+| 无订单时 `data` 为 `{}` | 这是合法状态，不是错误 | 解析为空列表，报告进入空状态分支 |
 
 ---
 
@@ -94,6 +106,8 @@ Token 通过环境变量 `MCD_MCP_TOKEN` 注入，仓库内不含任何真实凭
 | HTTP 429 | 提示触发限流（官方限制 600 次/分钟） |
 | 响应缺少关键字段 | 抛 `SchemaError` 并指出缺失字段名 |
 | 商品未匹配营养数据 | 计入"未匹配份数"并在报告口径提示中公开，不按 0 计算 |
+| 账户无历史订单 | 渲染空状态报告，说明可能原因（未下过单 / 手机号不一致），不显示一串零 |
+| Python 缺少根证书 | 自动探测系统证书与 certifi，避免用户手动配置 `SSL_CERT_FILE` |
 
 ---
 

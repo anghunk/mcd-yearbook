@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
 import urllib.error
 import urllib.request
 from typing import Any
@@ -20,9 +21,37 @@ MCP_ENDPOINT = "https://mcp.mcd.cn"
 TOKEN_ENV = "MCD_MCP_TOKEN"
 PROTOCOL_VERSION = "2025-06-18"
 
+# 部分 Python 发行版（例如 python.org 的 macOS 安装包）没有把根证书写进默认路径，
+# 会导致 CERTIFICATE_VERIFY_FAILED。这里按"系统证书 -> certifi -> 默认"的顺序探测，
+# 避免要求用户为了跑通而手动配置 SSL_CERT_FILE。
+_CA_CANDIDATES = (
+    os.environ.get("SSL_CERT_FILE", ""),
+    "/etc/ssl/cert.pem",
+    "/etc/pki/tls/certs/ca-bundle.crt",
+    "/etc/ssl/certs/ca-certificates.crt",
+    "/usr/local/etc/openssl@3/cert.pem",
+)
+
 
 class MCPError(RuntimeError):
     """MCP 调用失败。"""
+
+
+def _build_ssl_context() -> ssl.SSLContext:
+    """构造可用的 SSL 上下文。
+
+    Returns:
+        带有可信根证书的 SSLContext。
+    """
+    for candidate in _CA_CANDIDATES:
+        if candidate and os.path.exists(candidate):
+            return ssl.create_default_context(cafile=candidate)
+    try:
+        import certifi  # type: ignore
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
 
 
 class MCPClient:
@@ -41,6 +70,7 @@ class MCPClient:
         self.token = token or os.environ.get(TOKEN_ENV, "")
         self._session_id: str | None = None
         self._next_id = 1
+        self._ssl_context = _build_ssl_context()
 
     def _headers(self) -> dict[str, str]:
         """构造请求头。"""
@@ -68,7 +98,9 @@ class MCPClient:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(
+                request, timeout=30, context=self._ssl_context
+            ) as response:
                 session = response.headers.get("Mcp-Session-Id")
                 if session:
                     self._session_id = session
@@ -125,14 +157,16 @@ class MCPClient:
         return result.get("result", {}).get("tools", [])
 
     def call_tool(self, name: str, arguments: dict[str, Any] | None = None) -> Any:
-        """调用一个 Tool 并返回其文本内容。
+        """调用一个 Tool 并返回其内容。
 
         Args:
             name: Tool 名称。
             arguments: 调用参数。
 
         Returns:
-            Tool 返回的文本内容；若为 JSON 则返回已解析对象。
+            麦当劳 MCP 会把每个 Tool 的结果包成一段 Markdown 说明
+            （响应结构描述 + `## Original Response` 段落）。这里直接返回原始文本，
+            解析交给 `yearbook.normalize`，保持客户端只负责传输。
         """
         result = self._post(
             {
@@ -147,11 +181,12 @@ class MCPClient:
         if "error" in result:
             raise MCPError(f"调用 {name} 失败：{result['error']}")
 
-        content = result.get("result", {}).get("content", [])
+        tool_result = result.get("result", {})
+        if tool_result.get("isError"):
+            detail = tool_result.get("content", [{}])
+            raise MCPError(f"调用 {name} 返回错误：{detail}")
+
+        content = tool_result.get("content", [])
         if not content:
             return None
-        text = content[0].get("text", "")
-        try:
-            return json.loads(text)
-        except (json.JSONDecodeError, TypeError):
-            return text
+        return content[0].get("text", "")
